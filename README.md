@@ -30,7 +30,7 @@ uhm.setAll(255, 255, 255);
 uhm.show();
 ```
 ## Combining with other IO functions
-To allow control of the IO not used by the HAT, ```uhm.rpio``` is available to set up additional IO and other functionality that the node-rpio library provides.
+To allow control of the IO not used by the HAT, ```UHM.rpio``` is available to set up additional IO and other functionality that the node-rpio library provides.
 
 
 # API
