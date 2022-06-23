@@ -1,0 +1,40 @@
+{
+	"name": "unicorn-hat-mini",
+	"version": "1.0.0",
+	"description": "Driver for the Pimoroni Unicorn Hat Mini",
+	"main": "src/index.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/netbymatt/unicorn-hat-mini.git"
+	},
+	"keywords": [
+		"raspberry",
+		"pi",
+		"rpi",
+		"unicorn",
+		"hat",
+		"mini",
+		"pimoroni"
+	],
+	"engines": {
+		"node": ">=14.0.0"
+	},
+	"author": "Matt Walsh",
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/netbymatt/unicorn-hat-mini/issues"
+	},
+	"homepage": "https://github.com/netbymatt/unicorn-hat-mini#readme",
+	"devDependencies": {
+		"eslint": "^8.18.0",
+		"eslint-config-airbnb-base": "^15.0.0",
+		"eslint-plugin-import": "^2.26.0",
+		"nodemon": "^2.0.16"
+	},
+	"dependencies": {
+		"rpio": "^2.4.2"
+	}
+}
