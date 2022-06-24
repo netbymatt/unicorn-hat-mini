@@ -22,7 +22,7 @@ setInterval(() => {
 			const sc = Math.cos(step / ROWS) * ROWS + COLS;
 			const hue = Math.sqrt((c - dx) ** 2 + (r - dy) ** 2) / sc;
 			const rgb = HSVtoRGB(hue, 1, 1);
-			uhm.setPixel(c, r, rgb);
+			uhm.setPixel(r, c, rgb);
 		}
 	}
 	uhm.show();

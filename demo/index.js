@@ -14,7 +14,7 @@ const rand = () => Math.floor(Math.random() * 255);
 setInterval(() => {
 	for (let r = 0; r < uhm.ROWS; r += 1) {
 		for (let c = 0; c < uhm.COLS; c += 1) {
-			uhm.setPixel(c, r, rand(), rand(), rand());
+			uhm.setPixel(r, c, rand(), rand(), rand());
 		}
 	}
 	uhm.show();

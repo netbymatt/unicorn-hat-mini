@@ -100,6 +100,13 @@ uhm.setPixel([255,255,0]);
 |g|0-255|Green value of pixel. Automatically converted to the HAT limits of 0-63.|
 |b|0-255|Blue value of pixel. Automatically converted to the HAT limits of 0-63.|
 
+## uhm.getAll()
+Return all pixels as an array in the format: [row][col] = [r, g, b] format
+``` javascript
+const all = uhm.getAll();
+// all = [[[r, g, b], [r, g, b], ...], [[r, g, b], ...], ...]
+```
+
 ## uhm.show()
 Update the display with the latest display buffer as modified by ```uhm.setPixel()``` and ```uhm.setAll()```.
 ``` javascript

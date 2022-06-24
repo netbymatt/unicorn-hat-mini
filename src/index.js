@@ -65,22 +65,26 @@ class UHM extends EventEmitter {
 		y: undefined,
 	};
 
+	// cleanup monitoring
 	#exited = false;
+
+	// internal display management
+	#buffer = [];
+
+	#display = [];
 
 	constructor(options) {
 		super();
 		this.opts = { ...DEFAULT_OPTIONS, options };
 
 		// fill buffer with all zeros initially
-		this.buffer = [];
 		for (let i = 0; i < 28 * 8 * 2; i += 1) {
-			this.buffer.push(0);
+			this.#buffer.push(0);
 		}
 
 		// set display to all black
-		this.display = [];
 		for (let i = 0; i < ROWS * COLS; i += 1) {
-			this.display.push([0, 0, 0]);
+			this.#display.push([0, 0, 0]);
 		}
 
 		// configure rpio
@@ -126,7 +130,7 @@ class UHM extends EventEmitter {
 			sendDevice(dev, [CMD_GLOBAL_BRIGHTNESS, 0x01]);
 			sendDevice(dev, [CMD_SCROLL_CTRL, 0x00]);
 			sendDevice(dev, [CMD_SYSTEM_CTRL, 0x00]);
-			sendDevice(dev, [CMD_WRITE_DISPLAY, 0x00, ...this.buffer.slice(dev.offset, dev.offset + 28 * 8)]);
+			sendDevice(dev, [CMD_WRITE_DISPLAY, 0x00, ...this.#buffer.slice(dev.offset, dev.offset + 28 * 8)]);
 			sendDevice(dev, [CMD_COM_PIN_CTRL, 0xff]);
 			sendDevice(dev, [CMD_ROW_PIN_CTRL, 0xff, 0xff, 0xff, 0xff]);
 			sendDevice(dev, [CMD_SYSTEM_CTRL, 0x03]);
@@ -226,13 +230,13 @@ class UHM extends EventEmitter {
 		}
 
 		// determine the offset
-		const offset = (row * ROWS) + col;
-		this.display[offset] = [r, g, b];
+		const offset = (row * COLS) + col;
+		this.#display[offset] = [r, g, b];
 	}
 
 	getPixel(row, col) {
-		const offset = (row * ROWS) + col;
-		const shifted = this.display[offset];
+		const offset = (row * COLS) + col;
+		const shifted = this.#display[offset];
 		return [shifted[0], shifted[1], shifted[2]];
 	}
 
@@ -246,9 +250,22 @@ class UHM extends EventEmitter {
 		}
 		/* eslint-enable prefer-destructuring, no-param-reassign */
 
-		for (let i = 0; i <= 28 * 8 * 2; i += 1) {
-			this.display[i] = [r, g, b];
+		for (let i = 0; i <= ROWS * COLS; i += 1) {
+			this.#display[i] = [r, g, b];
 		}
+	}
+
+	// return all pixels in [row][col] = [r, g, b] format
+	getAll() {
+		const all = [];
+		for (let r = 0; r < ROWS; r += 1) {
+			const row = [];
+			for (let c = 0; c < COLS; c += 1) {
+				row.push(this.#display[r * COLS + c]);
+			}
+			all.push(row);
+		}
+		return all;
 	}
 
 	clear() {
@@ -271,14 +288,14 @@ class UHM extends EventEmitter {
 	show() {
 		for (let i = 0; i < ROWS * COLS; i += 1) {
 			const [ir, ig, ib] = LUT[i];
-			const [r, g, b] = this.display[i];
+			const [r, g, b] = this.#display[i];
 			// shift to 0-63
-			this.buffer[ir] = r >> 2;
-			this.buffer[ig] = g >> 2;
-			this.buffer[ib] = b >> 2;
+			this.#buffer[ir] = r >> 2;
+			this.#buffer[ig] = g >> 2;
+			this.#buffer[ib] = b >> 2;
 		}
 		bothDevices((dev) => {
-			sendDevice(dev, [CMD_WRITE_DISPLAY, 0x00, ...this.buffer.slice(dev.offset, dev.offset + 28 * 8)]);
+			sendDevice(dev, [CMD_WRITE_DISPLAY, 0x00, ...this.#buffer.slice(dev.offset, dev.offset + 28 * 8)]);
 		});
 	}
 
