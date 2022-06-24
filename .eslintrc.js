@@ -19,7 +19,7 @@ module.exports = {
 		'no-tabs': 0,
 		'no-console': 0,
 		'no-bitwise': ['error', {
-			allow: ['>>', '>>='],
+			allow: ['>>'],
 		}],
 		'max-len': ['error', 120],
 		'class-methods-use-this': 0,

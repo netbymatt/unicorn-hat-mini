@@ -65,6 +65,8 @@ class UHM extends EventEmitter {
 		y: undefined,
 	};
 
+	#exited = false;
+
 	constructor(options) {
 		super();
 		this.opts = { ...DEFAULT_OPTIONS, options };
@@ -95,22 +97,26 @@ class UHM extends EventEmitter {
 		rpio.i2cSetClockDivider(250); // 1 MHz
 
 		// cleanup on exit
-		const exit = () => {
-			console.log('stopping rpio');
-			bothDevices((dev) => {
-				sendDevice(dev, [CMD_COM_PIN_CTRL, 0x00]);
-				sendDevice(dev, [CMD_ROW_PIN_CTRL, 0x00, 0x00, 0x00, 0x00]);
-				sendDevice(dev, [CMD_SYSTEM_CTRL, 0x00]);
-			});
-			rpio.spiEnd();
-			rpio.exit();
-			if (this.opts.exitProcess) {
+		const exit = (type) => {
+			// only exit once
+			if (!this.#exited) {
+				bothDevices((dev) => {
+					sendDevice(dev, [CMD_COM_PIN_CTRL, 0x00]);
+					sendDevice(dev, [CMD_ROW_PIN_CTRL, 0x00, 0x00, 0x00, 0x00]);
+					sendDevice(dev, [CMD_SYSTEM_CTRL, 0x00]);
+				});
+				rpio.spiEnd();
+				rpio.exit();
+				this.#exited = true;
+			}
+			if (this.opts.exitProcess && type !== 'exit') {
 				process.exit();
 			}
 		};
 
 		process.on('SIGINT', exit);
 		process.on('SIGTERM', exit);
+		process.on('exit', () => exit('exit'));
 		// for use with nodemon
 		process.on('SIGUSR2', exit);
 
@@ -221,7 +227,13 @@ class UHM extends EventEmitter {
 
 		// determine the offset
 		const offset = (row * ROWS) + col;
-		this.display[offset] = [r >> 2, g >> 2, b >> 2];
+		this.display[offset] = [r, g, b];
+	}
+
+	getPixel(row, col) {
+		const offset = (row * ROWS) + col;
+		const shifted = this.display[offset];
+		return [shifted[0], shifted[1], shifted[2]];
 	}
 
 	setAll(r, g, b) {
@@ -232,9 +244,6 @@ class UHM extends EventEmitter {
 			b = r[2];
 			r = r[0];
 		}
-		r >>= 2;
-		g >>= 2;
-		b >>= 2;
 		/* eslint-enable prefer-destructuring, no-param-reassign */
 
 		for (let i = 0; i <= 28 * 8 * 2; i += 1) {
@@ -263,9 +272,10 @@ class UHM extends EventEmitter {
 		for (let i = 0; i < ROWS * COLS; i += 1) {
 			const [ir, ig, ib] = LUT[i];
 			const [r, g, b] = this.display[i];
-			this.buffer[ir] = r;
-			this.buffer[ig] = g;
-			this.buffer[ib] = b;
+			// shift to 0-63
+			this.buffer[ir] = r >> 2;
+			this.buffer[ig] = g >> 2;
+			this.buffer[ib] = b >> 2;
 		}
 		bothDevices((dev) => {
 			sendDevice(dev, [CMD_WRITE_DISPLAY, 0x00, ...this.buffer.slice(dev.offset, dev.offset + 28 * 8)]);

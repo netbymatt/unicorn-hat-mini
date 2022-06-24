@@ -72,6 +72,20 @@ uhm.setPixel(3,5,[255,0,255]);
 |g|0-255|Green value of pixel. Automatically converted to the HAT limits of 0-63.|
 |b|0-255|Blue value of pixel. Automatically converted to the HAT limits of 0-63.|
 
+## uhm.getPixel(row, col)
+Get the color of the pixel at (row, col).
+``` javascript
+// set pixel at row 3 column 5 to purple
+uhm.setPixel(3,5,255,0,255);
+const pixel = uhm.getPixel(3,5,255,0,255);
+// pixel = [255, 0, 255]
+```
+
+|Parameter|Range|Description|
+|---|---|---|
+|row|0-3|Vertical position of selected pixel|
+|col|0-16|Horizontal position of selected pixel|
+
 ## uhm.setAll(r, g, b)
 Set the color of all pixels. Must call ```uhm.show()``` for changes to be displayed on the HAT.
 ``` javascript
