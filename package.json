@@ -1,6 +1,6 @@
 {
 	"name": "unicorn-hat-mini",
-	"version": "1.1.0",
+	"version": "1.2.0",
 	"description": "Driver for the Pimoroni Unicorn Hat Mini",
 	"main": "src/index.js",
 	"scripts": {
